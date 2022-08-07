@@ -7,19 +7,11 @@ public static class Program
     [SupportedOSPlatform("windows")]
     public static void Main()
     {
-        ListRecursively(0, 0);
-
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine();
-
-        Console.WriteLine("desktop: " + Win32Windows.GetClassName(Win32Windows.GetDesktopWindow()));
-        ListRecursively(Win32Windows.GetDesktopWindow(), 1);
+        ListRecursively(new WindowHandle(0), 0);
     }
 
     [SupportedOSPlatform("windows")]
-    private static void ListRecursively(nint hWnd, int depth)
+    private static void ListRecursively(WindowHandle window, int depth)
     {
         string indent = "";
 
@@ -28,20 +20,9 @@ public static class Program
             indent += "- ";
         }
 
-        foreach (nint child in Win32Windows.EnumChildWindows(hWnd))
+        foreach (WindowHandle child in window.GetChildren(false).Where(x => x.Exists))
         {
-            nint parent = Win32Windows.GetParent(child);
-
-            if (parent != hWnd)
-            {
-                continue;
-            }
-
-            string title = Win32Windows.GetWindowText(child);
-            string className = Win32Windows.GetClassName(child);
-
-            Console.WriteLine($"{indent}{title} {{class: {className}}}");
-
+            Console.WriteLine($"{indent}{child.Text} {{class: {child.ClassName}}}");
             ListRecursively(child, depth + 1);
         }
     }

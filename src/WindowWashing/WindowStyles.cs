@@ -119,7 +119,7 @@ public enum WindowStyles : long
     /// The window is an overlapped window.
     /// Same as the <see cref="TiledWindow"/> style.
     /// </summary>
-    OverLappedWindow = Overlapped | Caption | SystemMenu | ThickFrame | MinimizeBox | MaximizeBox,
+    OverlappedWindow = Overlapped | Caption | SystemMenu | ThickFrame | MinimizeBox | MaximizeBox,
 
     /// <summary>
     /// The window is a pop-up window.
@@ -170,9 +170,9 @@ public enum WindowStyles : long
 
     /// <summary>
     /// The window is an overlapped window.
-    /// Same as the <see cref="OverLappedWindow"/> style.
+    /// Same as the <see cref="OverlappedWindow"/> style.
     /// </summary>
-    TiledWindow = OverLappedWindow,
+    TiledWindow = OverlappedWindow,
 
     /// <summary>
     /// The window is initially visible.
