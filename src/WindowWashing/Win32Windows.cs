@@ -1013,6 +1013,72 @@ public static unsafe class Win32Windows
     public static IEnumerable<nint> EnumChildWindows(void* hWnd)
         => EnumChildWindows((nint)hWnd);
 
+    /// <summary>
+    /// Gets the class name of a window.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>The class name of the given window.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetClassName(void* hWnd, bool throwOnError = false)
+    {
+        StringBuilder sb = new StringBuilder(256);
+        NativeMethods.SetLastError(0);
+        int read = NativeMethods.GetClassName(hWnd, sb, sb.Capacity);
+        int errorCode = Marshal.GetLastWin32Error();
+
+        if (read == 0 && errorCode != 0 && throwOnError)
+        {
+            throw new Win32Exception(errorCode);
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Gets the class name of a window.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>The class name of the given window.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetClassName(nint hWnd, bool throwOnError = false)
+        => GetClassName((void*)hWnd, throwOnError);
+
+    /// <summary>
+    /// Send a message to request the closing of a window.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>A value indicating whether or not the operation was succesful.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool DestroyWindow(void* hWnd, bool throwOnError = false)
+    {
+        NativeMethods.SetLastError(0);
+        bool result = NativeMethods.DestroyWindow(hWnd);
+
+        if (!result && throwOnError)
+        {
+            ThrowIfError();
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Send a message to request the closing of a window.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>A value indicating whether or not the operation was succesful.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool DestroyWindow(nint hWnd, bool throwOnError = false)
+        => DestroyWindow((void*)hWnd, throwOnError);
+
     private static int TrySetWindowLongInternal(void* hWnd, WindowLong index, long dwNewLong, out long oldLong)
     {
         NativeMethods.SetLastError(0);
@@ -1078,5 +1144,11 @@ public static unsafe class Win32Windows
 
         [DllImport(User32, SetLastError = true)]
         public static extern bool EnumChildWindows(void* hWnd, EnumWindowsInternalDelegate lpEnumFunc, void* lParam);
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern int GetClassName(void* hWnd, StringBuilder lpString, int maxCount);
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern bool DestroyWindow(void* hWnd);
     }
 }
