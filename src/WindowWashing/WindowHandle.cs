@@ -146,6 +146,39 @@ public unsafe readonly struct WindowHandle : IEquatable<WindowHandle>
     }
 
     /// <summary>
+    /// Gets or sets the window rectangle.
+    /// </summary>
+    public WindowRectangle Rectangle
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Win32Windows.GetWindowRect(ptr, true);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set => Move(value.X, value.Y, value.Width, value.Height, true);
+    }
+
+    /// <summary>
+    /// Gets or sets the window size.
+    /// </summary>
+    public WindowPoint Size
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Rectangle.Size;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set => Rectangle = new WindowRectangle(Position, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the window position.
+    /// </summary>
+    public WindowPoint Position
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Rectangle.Position;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set => Rectangle = new WindowRectangle(value, Size);
+    }
+
+    /// <summary>
     /// Converts the window handle into a void pointer.
     /// </summary>
     /// <param name="wh">The window handle.</param>

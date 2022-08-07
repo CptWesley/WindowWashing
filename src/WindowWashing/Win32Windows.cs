@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
+using WindowWashing.Internal;
 
 namespace WindowWashing;
 
@@ -1079,6 +1080,66 @@ public static unsafe class Win32Windows
     public static bool DestroyWindow(nint hWnd, bool throwOnError = false)
         => DestroyWindow((void*)hWnd, throwOnError);
 
+    /// <summary>
+    /// Get a rectangle of the window position.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="rect">The rectangle of the window.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>A value indicating whether or not the operation was succesful.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool GetWindowRect(void* hWnd, out WindowRectangle rect, bool throwOnError = false)
+    {
+        NativeMethods.SetLastError(0);
+        bool result = NativeMethods.GetWindowRect(hWnd, out WindowRectInternal lpRect);
+
+        if (!result && throwOnError)
+        {
+            ThrowIfError();
+        }
+
+        rect = new WindowRectangle(lpRect.Left, lpRect.Top, lpRect.Right - lpRect.Left, lpRect.Bottom - lpRect.Top);
+        return result;
+    }
+
+    /// <summary>
+    /// Get a rectangle of the window position.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="rect">The rectangle of the window.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>A value indicating whether or not the operation was succesful.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool GetWindowRect(nint hWnd, out WindowRectangle rect, bool throwOnError = false)
+        => GetWindowRect((void*)hWnd, out rect, throwOnError);
+
+    /// <summary>
+    /// Get a rectangle of the window position.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>The rectangle of the window.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WindowRectangle GetWindowRect(void* hWnd, bool throwOnError = false)
+    {
+        GetWindowRect(hWnd, out WindowRectangle result, throwOnError);
+        return result;
+    }
+
+    /// <summary>
+    /// Get a rectangle of the window position.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="throwOnError">Indicates whether or not an exception should be thrown when an error occured.</param>
+    /// <returns>The rectangle of the window.</returns>
+    [SupportedOSPlatform(WindowsOS)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WindowRectangle GetWindowRect(nint hWnd, bool throwOnError = false)
+        => GetWindowRect((void*)hWnd, throwOnError);
+
     private static int TrySetWindowLongInternal(void* hWnd, WindowLong index, long dwNewLong, out long oldLong)
     {
         NativeMethods.SetLastError(0);
@@ -1150,5 +1211,8 @@ public static unsafe class Win32Windows
 
         [DllImport(User32, SetLastError = true)]
         public static extern bool DestroyWindow(void* hWnd);
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern bool GetWindowRect(void* hWnd, out WindowRectInternal lpRect);
     }
 }
